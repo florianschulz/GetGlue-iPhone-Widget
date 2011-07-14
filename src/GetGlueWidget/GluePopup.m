@@ -39,8 +39,14 @@ BOOL ggIsPad() {
 	if (self != nil) {
 		self.backgroundColor = [UIColor clearColor];
 		[self setClipsToBounds:YES];
+        
+        
+		loadingSpinner = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge] autorelease];
+		[self addSubview:loadingSpinner];
+        
 		webview = [[[UIWebView alloc] initWithFrame:CGRectMake(10, 47, rect.size.width-20, rect.size.height-72)] autorelease];
-		webview.backgroundColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1];
+		webview.backgroundColor = [UIColor clearColor];
+        webview.opaque = NO;
 		webview.delegate = self;
 		
 		if(ggIsPad()){
@@ -51,8 +57,6 @@ BOOL ggIsPad() {
 		
 		[self addSubview:webview];
 		
-		loadingSpinner = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge] autorelease];
-		[self addSubview:loadingSpinner];
 		
 		closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
 		[closeBtn setImage:[UIImage imageNamed:@"GetGlueWidget.bundle/getglue_close.png"] forState:UIControlStateNormal];
@@ -245,14 +249,13 @@ BOOL ggIsPad() {
 												 name:@"UIDeviceOrientationDidChangeNotification" object:nil];
 	
 	[loadingSpinner startAnimating];
-	[webview setHidden:YES];
 	[webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: [NSString stringWithFormat: @"http://%@/widget/checkin?style=%@&app=mobileWidget_%@&%@", GETGLUE_POPUP_HOST, ggIsPad() ? @"tablet" : @"mobile",  GETGLUE_WIDGET_VERSION, params]]]];	
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
 	
 	[loadingSpinner stopAnimating];
-	[webview setHidden:NO];
+	[loadingSpinner setHidden:YES];
 }
 
 - (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType {
