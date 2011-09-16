@@ -247,9 +247,9 @@ BOOL ggIsPad() {
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(orientationDidChange:)
 												 name:@"UIDeviceOrientationDidChangeNotification" object:nil];
-	
+    
 	[loadingSpinner startAnimating];
-	[webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: [NSString stringWithFormat: @"http://%@/widget/checkin?style=%@&app=mobileWidget_%@&%@", GETGLUE_POPUP_HOST, ggIsPad() ? @"tablet" : @"mobile",  GETGLUE_WIDGET_VERSION, params]]]];	
+	[webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: [NSString stringWithFormat: @"http://%@/widget/checkin?style=%@&app=mobileWidget_%@&theme=%@&%@", GETGLUE_POPUP_HOST, ggIsPad() ? @"tablet" : @"mobile",  GETGLUE_WIDGET_VERSION, self.widget.theme ? self.widget.theme : @"{}", params]]]];	
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
@@ -261,7 +261,7 @@ BOOL ggIsPad() {
 - (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType {
 	NSURL *url = request.URL;
 	NSString *urlString = url.absoluteString;
-	//NSLog(urlString);
+	NSLog(@"%@", urlString);
 	if ([urlString hasPrefix:@"getglue://userDidCheckin"]) {
 		NSString *params = url.query;
 		[self.widget didPerformCheckinForUser:params]; 	

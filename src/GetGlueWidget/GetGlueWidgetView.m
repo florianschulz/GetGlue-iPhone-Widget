@@ -16,9 +16,18 @@
 
 #import "GetGlueWidget.h"
 
+static NSString *toString(id object) {
+    return [NSString stringWithFormat: @"%@", object];
+}
+
+static NSString *urlEncode(id object) {
+    NSString *string = toString(object);
+    return (NSString*)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)string, NULL, CFSTR("'\"?=&+<>;:-"), kCFStringEncodingUTF8);
+}
+
 @implementation GetGlueWidgetView
 
-@synthesize delegate, objectKey, source;
+@synthesize delegate, objectKey, source, theme;
 
 - (id) initWithFrame:(CGRect)frame
 {
@@ -57,11 +66,30 @@
 -(void)setSource: (NSString*) newSource {    
 	if (source != newSource) {
 		[source release];
-		source = (NSString*)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)newSource, NULL, CFSTR("'\"?=&+<>;:-"), kCFStringEncodingUTF8);
+		source = urlEncode(newSource);
 		if(objectKey) {
 			[webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: [NSString stringWithFormat: @"http://%@/html/checkinMobile.html?objectId=%@#%@", GETGLUE_WIDGET_HOST, objectKey,source]]]];
 		}
 	}
+}
+
+-(void)setTheme:(NSString *)newTheme {
+	if (theme != newTheme) {
+		[theme release];
+		theme = urlEncode(newTheme);
+        NSLog(@"Setting theme:\n\n%@", newTheme);
+	}
+}
+
+-(void)setThemeWithDictionary:(NSDictionary *)newTheme {
+	NSMutableArray *parts = [NSMutableArray array];
+    for (id key in newTheme) {
+        id value = [newTheme objectForKey: key];
+        NSString *part = [NSString stringWithFormat: @"'%@': '%@'", urlEncode(key), urlEncode(value)];
+        [parts addObject: part];
+    }
+    [self setTheme:[NSString stringWithFormat: @"{%@}", [parts componentsJoinedByString: @","]]];
+
 }
 
 - (void)didPerformCheckinForUser:(NSString*)username  {

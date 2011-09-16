@@ -24,11 +24,15 @@
 	UIWebView* webview;
 	NSString* objectKey;
 	NSString* source;
+    NSString* theme;
 }
 
 @property (nonatomic,assign) id<GetGlueWidgetDelegate> delegate;
 @property (copy) NSString* objectKey;
-@property (copy) NSString* source;
+@property (assign) NSString* source;
+@property (assign) NSString* theme;
+
+-(void)setThemeWithDictionary:(NSDictionary *)newTheme;
 
 // private
 - (void) doPostInit;
