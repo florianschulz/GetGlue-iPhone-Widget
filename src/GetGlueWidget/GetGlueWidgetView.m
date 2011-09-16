@@ -73,23 +73,18 @@ static NSString *urlEncode(id object) {
 	}
 }
 
--(void)setTheme:(NSString *)newTheme {
-	if (theme != newTheme) {
-		[theme release];
-		theme = urlEncode(newTheme);
-        NSLog(@"Setting theme:\n\n%@", newTheme);
-	}
-}
-
--(void)setThemeWithDictionary:(NSDictionary *)newTheme {
+- (NSString*)getThemeJSON {
+    if(!self.theme) {
+        return urlEncode(@"{}");
+    }
+    
 	NSMutableArray *parts = [NSMutableArray array];
-    for (id key in newTheme) {
-        id value = [newTheme objectForKey: key];
-        NSString *part = [NSString stringWithFormat: @"'%@': '%@'", urlEncode(key), urlEncode(value)];
+    for (id key in self.theme) {
+        id value = [self.theme objectForKey: key];
+        NSString *part = [NSString stringWithFormat: @"\"%@\": \"%@\"", key, value];
         [parts addObject: part];
     }
-    [self setTheme:[NSString stringWithFormat: @"{%@}", [parts componentsJoinedByString: @","]]];
-
+    return urlEncode([NSString stringWithFormat: @"{%@}", [parts componentsJoinedByString: @","]]);
 }
 
 - (void)didPerformCheckinForUser:(NSString*)username  {
@@ -111,8 +106,7 @@ static NSString *urlEncode(id object) {
 	} if ([urlString hasPrefix:@"getglue://checkin"]) {
 		NSString *params = url.query;
 		
-		GluePopup* popup = [[[GluePopup alloc] init] autorelease];
-		popup.widget = self.self;
+		GluePopup* popup = [[[GluePopup alloc] initWithWidget: self] autorelease];
 		[popup showCheckinScreenWithParams:params];
 		return NO;
 	}
