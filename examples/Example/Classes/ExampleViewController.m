@@ -31,7 +31,7 @@
     gg2.theme = [NSDictionary dictionaryWithObjectsAndKeys: 
                  @"#333333", @"windowBgColor",
                  @"dark", @"logoStyle",
-                 @"http://cl.ly/AB2O/Screen_shot_2011-09-16_at_3.42.13_PM.png",@"loginImage",
+                 @"http://getglue.com/glue/webroot/img/resources/downloads/logo_mark_blue.png",@"loginImage",
                  @"#1c1c1c",@"loginBgColor",
                  @"#fefefe",@"linkColor",
                  @"#555",@"borderColor",
