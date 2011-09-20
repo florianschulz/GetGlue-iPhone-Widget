@@ -53,10 +53,10 @@ BOOL ggIsPad() {
 		[self setClipsToBounds:YES];
         
         bgColor = self.widget.theme && [self.widget.theme objectForKey:@"windowBgColor"] ? 
-        stringToColor([self.widget.theme objectForKey:@"windowBgColor"]).CGColor : 
-        [UIColor colorWithWhite:0.87f alpha:1.0f].CGColor;
-        darkBevelColor = [UIColor colorWithWhite:0.0f alpha:0.25f].CGColor;
-        lightBevelColor = [UIColor colorWithWhite:1.0f alpha:0.25f].CGColor;
+        stringToColor([self.widget.theme objectForKey:@"windowBgColor"]) : 
+        [UIColor colorWithWhite:0.87f alpha:1.0f];
+        darkBevelColor = [UIColor colorWithWhite:0.0f alpha:0.25f];
+        lightBevelColor = [UIColor colorWithWhite:1.0f alpha:0.25f];
         
         
 		loadingSpinner = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge] autorelease];
@@ -85,6 +85,10 @@ BOOL ggIsPad() {
 		[self addSubview:closeBtn];
 		
 		[self setSizeForOrientation:NO];
+        
+        [bgColor retain];
+        [darkBevelColor retain];
+        [lightBevelColor retain];
 	}
 	return self;
 }
@@ -94,6 +98,9 @@ BOOL ggIsPad() {
 	webview.delegate = nil;
     [webview stopLoading];
     [logoImg release];
+    [bgColor release];
+    [darkBevelColor release];
+    [lightBevelColor release];
     [super dealloc];
 }
 
@@ -104,7 +111,7 @@ BOOL ggIsPad() {
 	CGContextSaveGState(context);
 		CGContextSetShadow(context, CGSizeMake(0, 0), 20);
     
-        CGContextSetFillColorWithColor(context, bgColor);
+        CGContextSetFillColorWithColor(context, bgColor.CGColor);
     
 		CGRect drawrect = CGRectInset(rect, 10, 10);
 		
@@ -129,7 +136,7 @@ BOOL ggIsPad() {
 		CGContextSetLineWidth(context, 1);
 	
     // Top lines
-        CGContextSetStrokeColorWithColor(context, darkBevelColor);
+        CGContextSetStrokeColorWithColor(context, darkBevelColor.CGColor);
 		CGContextMoveToPoint(context, minx, miny+35.5);
 		CGContextAddLineToPoint(context, maxx, miny+35.5);
 		CGContextStrokePath(context);
@@ -138,7 +145,7 @@ BOOL ggIsPad() {
 		CGContextStrokePath(context);
 	
 		// Bottom lines
-        CGContextSetStrokeColorWithColor(context, lightBevelColor);	
+        CGContextSetStrokeColorWithColor(context, lightBevelColor.CGColor);	
 		CGContextMoveToPoint(context, minx, miny+36.5);
 		CGContextAddLineToPoint(context, maxx, miny+36.5);
 		CGContextStrokePath(context);

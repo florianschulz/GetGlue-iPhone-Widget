@@ -27,9 +27,9 @@
 	UIDeviceOrientation currentOrientation;
 	UIView* overlay;
     
-    CGColorRef bgColor;
-    CGColorRef darkBevelColor;
-    CGColorRef lightBevelColor;
+    UIColor* bgColor;
+    UIColor* darkBevelColor;
+    UIColor* lightBevelColor;
     
     UIImage* logoImg;
 }
