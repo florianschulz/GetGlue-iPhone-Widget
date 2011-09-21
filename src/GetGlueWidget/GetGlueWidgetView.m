@@ -16,9 +16,18 @@
 
 #import "GetGlueWidget.h"
 
+static NSString *toString(id object) {
+    return [NSString stringWithFormat: @"%@", object];
+}
+
+static NSString *urlEncode(id object) {
+    NSString *string = toString(object);
+    return (NSString*)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)string, NULL, CFSTR("'\"?=&+<>;:-"), kCFStringEncodingUTF8);
+}
+
 @implementation GetGlueWidgetView
 
-@synthesize delegate, objectKey, source;
+@synthesize delegate, objectKey, source, theme;
 
 - (id) initWithFrame:(CGRect)frame
 {
@@ -57,11 +66,25 @@
 -(void)setSource: (NSString*) newSource {    
 	if (source != newSource) {
 		[source release];
-		source = (NSString*)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)newSource, NULL, CFSTR("'\"?=&+<>;:-"), kCFStringEncodingUTF8);
+		source = urlEncode(newSource);
 		if(objectKey) {
 			[webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: [NSString stringWithFormat: @"http://%@/html/checkinMobile.html?objectId=%@#%@", GETGLUE_WIDGET_HOST, objectKey,source]]]];
 		}
 	}
+}
+
+- (NSString*)getThemeJSON {
+    if(!self.theme) {
+        return urlEncode(@"{}");
+    }
+    
+	NSMutableArray *parts = [NSMutableArray array];
+    for (id key in self.theme) {
+        id value = [self.theme objectForKey: key];
+        NSString *part = [NSString stringWithFormat: @"\"%@\": \"%@\"", key, value];
+        [parts addObject: part];
+    }
+    return urlEncode([NSString stringWithFormat: @"{%@}", [parts componentsJoinedByString: @","]]);
 }
 
 - (void)didPerformCheckinForUser:(NSString*)username  {
@@ -83,8 +106,7 @@
 	} if ([urlString hasPrefix:@"getglue://checkin"]) {
 		NSString *params = url.query;
 		
-		GluePopup* popup = [[[GluePopup alloc] init] autorelease];
-		popup.widget = self.self;
+		GluePopup* popup = [[[GluePopup alloc] initWithWidget: self] autorelease];
 		[popup showCheckinScreenWithParams:params];
 		return NO;
 	}

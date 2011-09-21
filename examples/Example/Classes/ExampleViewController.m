@@ -20,36 +20,29 @@
 
 @synthesize gg;
 
-/*
-// The designated initializer. Override to perform setup that is required before the view is loaded.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
-        // Custom initialization
-    }
-    return self;
-}
-*/
-
-/*
-// Implement loadView to create a view hierarchy programmatically, without using a nib.
-- (void)loadView {
-}
-*/
-
-
-
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
     [super viewDidLoad];
 	gg.objectKey = @"tv_shows/weeds";
-	
+    
 	GetGlueWidgetView* gg2 = [[[GetGlueWidgetView alloc] initWithFrame:CGRectMake(20, 110, 64, 74)] autorelease];
 	gg2.source = @"http://www.hbo.com/true-blood/"; // When setting a custom source, always set it before objectKey
 	gg2.objectKey = @"tv_shows/true_blood"; // Setting objectKey will start the webview loading
+    gg2.theme = [NSDictionary dictionaryWithObjectsAndKeys: 
+                 @"#333333", @"windowBgColor",
+                 @"dark", @"logoStyle",
+                 @"http://getglue.com/glue/webroot/img/resources/downloads/logo_mark_blue.png",@"loginImage",
+                 @"#1c1c1c",@"loginBgColor",
+                 @"#fefefe",@"linkColor",
+                 @"#555",@"borderColor",
+                 @"#222",@"bodyBgColor",
+                 @"#232323",@"headerBgColor",
+                 @"#fefefe",@"headerTextColor",
+                 @"#131313",@"headerTextShadowColor",
+                 @"#8e8e8e",@"formBgColor",
+    nil];
 	[self.view addSubview:gg2];
 }
-
-
 
 
 // Override to allow orientations other than the default portrait orientation.
@@ -63,12 +56,6 @@
 	
 	// Release any cached data, images, etc that aren't in use.
 }
-
-- (void)viewDidUnload {
-	// Release any retained subviews of the main view.
-	// e.g. self.myOutlet = nil;
-}
-
 
 - (void)dealloc {
     [super dealloc];

@@ -21,6 +21,16 @@
 
 #import "GetGlueWidget.h"
 
+static UIColor *stringToColor(NSString* string) {
+    unsigned int c;
+    if ([string characterAtIndex:0] == '#') {
+        [[NSScanner scannerWithString:[string substringFromIndex:1]] scanHexInt:&c];
+    } else {
+        [[NSScanner scannerWithString:string] scanHexInt:&c];
+    }
+    return [UIColor colorWithRed:((c & 0xff0000) >> 16)/255.0 green:((c & 0xff00) >> 8)/255.0 blue:(c & 0xff)/255.0 alpha:1.0];
+}
+
 @implementation GluePopup
 
 @synthesize widget;
@@ -33,12 +43,20 @@ BOOL ggIsPad() {
 	#endif
 }
 
-- (id) init {
+- (id) initWithWidget: (GetGlueWidgetView*) _widget {
 	CGRect rect = ggIsPad() ? CGRectMake(3, 23, 487, 760) : CGRectMake(3, 23, 314, 454);
 	self = [super initWithFrame: rect];
 	if (self != nil) {
+        self.widget = _widget;
+        
 		self.backgroundColor = [UIColor clearColor];
 		[self setClipsToBounds:YES];
+        
+        bgColor = self.widget.theme && [self.widget.theme objectForKey:@"windowBgColor"] ? 
+        stringToColor([self.widget.theme objectForKey:@"windowBgColor"]) : 
+        [UIColor colorWithWhite:0.87f alpha:1.0f];
+        darkBevelColor = [UIColor colorWithWhite:0.0f alpha:0.25f];
+        lightBevelColor = [UIColor colorWithWhite:1.0f alpha:0.25f];
         
         
 		loadingSpinner = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge] autorelease];
@@ -57,14 +75,20 @@ BOOL ggIsPad() {
 		
 		[self addSubview:webview];
 		
-		
+        logoImg = [[UIImage imageNamed:[NSString stringWithFormat: @"GetGlueWidget.bundle/getglue_logo_%@.png", self.widget.theme && [self.widget.theme objectForKey:@"logoStyle"] ? [self.widget.theme objectForKey:@"logoStyle"] : @"light"]] retain];
+        
 		closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-		[closeBtn setImage:[UIImage imageNamed:@"GetGlueWidget.bundle/getglue_close.png"] forState:UIControlStateNormal];
+		[closeBtn setImage:[UIImage imageNamed:[NSString stringWithFormat: @"GetGlueWidget.bundle/getglue_close_%@.png", self.widget.theme && [self.widget.theme objectForKey:@"logoStyle"] ? [self.widget.theme objectForKey:@"logoStyle"] : @"light"]] forState:UIControlStateNormal];
+        
 		closeBtn.frame = CGRectMake(rect.size.width-45, 11, 35, 35);
 		[closeBtn addTarget:self action:@selector(closePopup:) forControlEvents:UIControlEventTouchUpInside];
 		[self addSubview:closeBtn];
 		
 		[self setSizeForOrientation:NO];
+        
+        [bgColor retain];
+        [darkBevelColor retain];
+        [lightBevelColor retain];
 	}
 	return self;
 }
@@ -73,6 +97,10 @@ BOOL ggIsPad() {
 -(void) dealloc {
 	webview.delegate = nil;
     [webview stopLoading];
+    [logoImg release];
+    [bgColor release];
+    [darkBevelColor release];
+    [lightBevelColor release];
     [super dealloc];
 }
 
@@ -82,8 +110,9 @@ BOOL ggIsPad() {
 	// window
 	CGContextSaveGState(context);
 		CGContextSetShadow(context, CGSizeMake(0, 0), 20);
-		CGContextSetRGBFillColor(context, 0.87f, 0.87f, 0.87f, 1.0f);
-		
+    
+        CGContextSetFillColorWithColor(context, bgColor.CGColor);
+    
 		CGRect drawrect = CGRectInset(rect, 10, 10);
 		
 		CGFloat radius = 10.0;	
@@ -100,14 +129,14 @@ BOOL ggIsPad() {
 	
 	// logo
 	CGContextSaveGState(context);
-		[[UIImage imageNamed:@"GetGlueWidget.bundle/getglue_logo.png"] drawInRect: CGRectMake(20, 19, 72, 18)];
+    [logoImg drawInRect: CGRectMake(20, 19, 72, 18)];
 	CGContextRestoreGState(context);
 	
 	CGContextSaveGState(context);
 		CGContextSetLineWidth(context, 1);
 	
-		// Top lines
-		CGContextSetRGBStrokeColor(context, 0.68f,0.68f,0.68f,1.0f);
+    // Top lines
+        CGContextSetStrokeColorWithColor(context, darkBevelColor.CGColor);
 		CGContextMoveToPoint(context, minx, miny+35.5);
 		CGContextAddLineToPoint(context, maxx, miny+35.5);
 		CGContextStrokePath(context);
@@ -116,7 +145,7 @@ BOOL ggIsPad() {
 		CGContextStrokePath(context);
 	
 		// Bottom lines
-		CGContextSetRGBStrokeColor(context, 1.0f,1.0f,1.0f,1.0f);		
+        CGContextSetStrokeColorWithColor(context, lightBevelColor.CGColor);	
 		CGContextMoveToPoint(context, minx, miny+36.5);
 		CGContextAddLineToPoint(context, maxx, miny+36.5);
 		CGContextStrokePath(context);
@@ -247,9 +276,9 @@ BOOL ggIsPad() {
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(orientationDidChange:)
 												 name:@"UIDeviceOrientationDidChangeNotification" object:nil];
-	
+    
 	[loadingSpinner startAnimating];
-	[webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: [NSString stringWithFormat: @"http://%@/widget/checkin?style=%@&app=mobileWidget_%@&%@", GETGLUE_POPUP_HOST, ggIsPad() ? @"tablet" : @"mobile",  GETGLUE_WIDGET_VERSION, params]]]];	
+	[webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: [NSString stringWithFormat: @"http://%@/widget/checkin?style=%@&app=mobileWidget_%@&theme=%@&%@", GETGLUE_POPUP_HOST, ggIsPad() ? @"tablet" : @"mobile",  GETGLUE_WIDGET_VERSION, [self.widget getThemeJSON], params]]]];	
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
@@ -261,7 +290,7 @@ BOOL ggIsPad() {
 - (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType {
 	NSURL *url = request.URL;
 	NSString *urlString = url.absoluteString;
-	//NSLog(urlString);
+	NSLog(@"%@", urlString);
 	if ([urlString hasPrefix:@"getglue://userDidCheckin"]) {
 		NSString *params = url.query;
 		[self.widget didPerformCheckinForUser:params]; 	

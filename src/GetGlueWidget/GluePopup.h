@@ -26,11 +26,18 @@
 	GetGlueWidgetView* widget;
 	UIDeviceOrientation currentOrientation;
 	UIView* overlay;
+    
+    UIColor* bgColor;
+    UIColor* darkBevelColor;
+    UIColor* lightBevelColor;
+    
+    UIImage* logoImg;
 }
 
 @property(nonatomic,assign) GetGlueWidgetView* widget;
 
 - (void)showCheckinScreenWithParams: (NSString*) params;
 - (void)setSizeForOrientation: (BOOL) animate;
-
+- (id) initWithWidget: (GetGlueWidgetView*) _widget;
+    
 @end

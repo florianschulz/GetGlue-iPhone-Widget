@@ -14,7 +14,7 @@
  limitations under the License.
 */
 
-#define GETGLUE_WIDGET_VERSION @"1_0"
+#define GETGLUE_WIDGET_VERSION @"1_1"
 #define GETGLUE_WIDGET_HOST @"widgets.getglue.com"
 #define GETGLUE_POPUP_HOST @"getglue.com"
 
