@@ -107,9 +107,36 @@ When the widget initially loads, or after a check-in, this method will be called
 - (BOOL)widget:(GetGlueWidgetView*) widget shouldLaunchURL:(NSURL*) url
 -----------------------------------------------------------------------
 
-By default, external URLs (such as object pages on getglue.com) are loaded in safari. If you wish to load these in a webview within your own app, you may return `NO` in this delegate, and launch `url` onw your own.
+By default, external URLs (such as object pages on getglue.com) are loaded in safari. If you wish to load these in a webview within your own app, you may return `NO` in this delegate, and launch `url` on your own.
 
+Theming
+=======
 
+Widgets can be themed to better integrate with their host application. Theme values are passed to the widget by providing a `NSDictionary` of theme keys and values, as  in the [example theme](https://github.com/GetGlue/GetGlue-iPhone-Widget/blob/master/examples/Example/Classes/ExampleViewController.m#L31-43). Besides the theme values listed here, common theme elements are listed in the [main widgets documentation](http://getglue.com/widgets).
+
+`loginBgColor` sets the background color for main, login, and signup forms on the widget.
+
+`loginImage` sets the background image for main logged-out screen that shows the login and Facebook Connect links.
+
+`logoStyle` controls which logo is used in the border. Either `dark` or `light` is accepted to better match with the theme.
+
+`windowBgColor` is the color of the top and bottom borders around the widget.
+
+`headerTextShadowColor` controls color of the text shadow in the widget header on the check-in screen.
+
+`linkColor` controls the default color of all links across the widget.
+
+`borderColor` specifies the border color between stream items on the check-in screen, and the color of accent borders on other screens.
+
+`bodyBgColor` is the background color of the stream on the check-in screen.
+
+`headerBgColor` sets the background color of the heading on the check-in page, where the object image and stats are displayed.
+
+`headerTextColor` sets the text color of the check-in page heading.
+
+`headerTextShadowColor` controls the text shadow on the text above.
+
+`formBgColor` is the background color of the check-in form.
 
 Getting Help
 ============
